@@ -1,0 +1,22 @@
+{
+  "startup_app": {
+    "name": "Excel-API-Example",
+    "url": "http://localhost:3000",
+    "uuid": "excel-api-example",
+    "autoShow": true,
+    "defaultWidth": 760,
+    "defaultHeight": 704,
+    "defaultTop": 100,
+    "defaultLeft": 100,
+    "frame": true
+  },
+  "runtime": {
+    "arguments": "",
+    "version": "10.66.41.18"
+  },
+  "services": [
+    {
+      "name": "excel"
+    }
+  ]
+}
