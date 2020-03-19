@@ -72,6 +72,7 @@ export default class App extends Component {
 
   getSheet = (workbook) => {
     console.log('getSheet from', workbook);
+    this.setState({ book: workbook });
     return workbook.getWorksheets();
   }
 
@@ -92,16 +93,24 @@ export default class App extends Component {
 
   // Push the entire `cellGrid` to the `sheet` offset at cell `A1`
   pushToSheet = async () => {
-    const { cellGrid, sheet } = this.state;
+    const { book, cellGrid, sheet } = this.state;
     console.log('Saving: ', cellGrid);
     console.log('to:', sheet);
     const result = await sheet.setCells(cellGrid, 'A1');
     console.log('Response: ', result);
+    // Force save the book
+    this.saveSheet(book)
+  }
+
+  saveSheet = async (book) => {
+    await book.save();
   }
 
   render() {
+    const { cellGrid } = this.state;
     return (
       <>
+        {/* This script is required to use the Excel plugin */}
         <Helmet>
           <script src="https://openfin.github.io/excel-api-example/client/fin.desktop.Excel.js"></script>
         </Helmet>
@@ -114,6 +123,7 @@ export default class App extends Component {
                     cellKey={`${colVal}${rowVal}`}
                     storeValue={this.storeValue(colIdx, rowIdx)}
                     key={`${colIdx}-${rowIdx}`}
+                    initValue={cellGrid[colIdx][rowIdx]}
                   />
                 ))
               ))

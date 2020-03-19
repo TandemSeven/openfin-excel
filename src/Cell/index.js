@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import styles from './styles.module.scss';
 
-export const Cell = ({ storeValue }) => {
-  const [value, setValue] = useState('');
+export const Cell = ({ storeValue, initValue = '' }) => {
+  const [value, setValue] = useState(initValue);
   const [focus, setFocus] = useState(false);
 
   const inputClass = classNames(
