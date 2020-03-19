@@ -5,6 +5,8 @@ import styles from './styles.module.scss';
 
 const COLUMN_KEYS = ['A', 'B', 'C', 'D', 'E'];
 const ROW_KEYS = ['1', '2', '3', '4', '5'];
+
+// This is meant to be an in-memory representation of the entire grid of cells
 const INITIAL_CELL_GRID = [
   ['', '', '', '', ''],
   ['', '', '', '', ''],
@@ -29,29 +31,35 @@ export default class App extends Component {
   }
 
   // Clear the intervalId
-  clearIntervalAndStartService = () => {
+  clearIntervalAndStartService = async () => {
     console.log('clearIntervalAndStartService');
     clearInterval(this.excelApiStatusID);
-    window.fin.desktop.ExcelService.init()
-      .then(this.checkConnectionStatus)
-      .then(() => console.log('Excel Service ready'))
-      .then(this.connectToExcel)
-      .then(this.createBook)
-      .then(this.getSheet)
-      .then(this.activateSheet)
-      .catch((err) => console.error('Error: ', err));
+    try {
+      // Start the service
+      await window.fin.desktop.ExcelService.init();
+      // Connect to Excel application
+      await this.connectToExcel();
+
+      // Confirm status of connection to Excel
+      const connected = await this.checkConnectionStatus();
+      if (connected) console.log('Connected to Excel');
+      if (!connected) throw Error('Failed to establish connection');
+
+      // Create a new book
+      const book = await this.createBook();
+      // Get the newly created sheets
+      const sheets = await this.getSheet(book);
+      // Activate the sheet to begin editing
+      await this.activateSheet(sheets);
+    } catch (error) {
+      console.log('error: ', error);
+    }
   }
 
-  // Check the status off the Excel service connection
   checkConnectionStatus = () => {
-    window.fin.desktop.Excel.getConnectionStatus((connected) => {
-      connected
-        ? console.log('Connected to Excel')
-        : console.log('Excel not connected');
-    })
+    return window.fin.desktop.Excel.getConnectionStatus();
   }
 
-  // Boot up the Excel program
   connectToExcel = () => {
     console.log('connectToExcel');
     return window.fin.desktop.Excel.run();
@@ -67,10 +75,10 @@ export default class App extends Component {
     return workbook.getWorksheets();
   }
 
-  activateSheet = (sheet) => {
-    console.log('activateSheet', sheet[0]);
-    this.setState({ sheet: sheet[0] });
-    return sheet[0].activate();
+  activateSheet = (sheets) => {
+    console.log('activateSheet', sheets[0]);
+    this.setState({ sheet: sheets[0] });
+    return sheets[0].activate();
   }
 
   // Set latest value in state
@@ -82,11 +90,7 @@ export default class App extends Component {
     });
   }
 
-  // example using async to update state with result of promise
-  getBooks = async () => {
-    this.setState({ books: await window.fin.desktop.Excel.getWorkbooks() });
-  }
-
+  // Push the entire `cellGrid` to the `sheet` offset at cell `A1`
   pushToSheet = async () => {
     const { cellGrid, sheet } = this.state;
     console.log('Saving: ', cellGrid);
