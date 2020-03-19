@@ -5,7 +5,7 @@
     "uuid": "excel-api-example",
     "autoShow": true,
     "defaultWidth": 760,
-    "defaultHeight": 704,
+    "defaultHeight": 500,
     "defaultTop": 100,
     "defaultLeft": 100,
     "frame": true

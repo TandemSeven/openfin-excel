@@ -1,0 +1,20 @@
+body {
+  background-color: #282c34;
+  padding-top: 2rem;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  > * {
+    margin-bottom: 1rem;
+  }
+}
+
+.cellGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 70px);
+  grid-template-rows: repeat(5, 25px);
+}
